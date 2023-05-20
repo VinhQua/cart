@@ -9,15 +9,19 @@ import {
   LOADING,
   DISPLAY_ITEMS,
 } from "./action";
-import cartItems from "./data";
+
+import { totalCostAmount } from "./utilis";
+import axios from "axios";
 
 const initialSate = {
-  loading: false,
-  cart: new Map(cartItems.map((item) => [item.id, item])),
+  loading: true,
+  cart: new Map(),
 };
 
 export const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialSate);
+
+  const { totalAmount, totalCost } = totalCostAmount(state.cart);
 
   const clearCart = () => {
     dispatch({ type: CLEAR_CART });
@@ -32,9 +36,32 @@ export const AppProvider = ({ children }) => {
     dispatch({ type: DECREASE_CART, payload: { id } });
   };
 
+  const getData = async () => {
+    dispatch({ type: LOADING });
+    try {
+      const { data } = await axios.get(
+        "https://www.course-api.com/react-useReducer-cart-project"
+      );
+
+      dispatch({ type: DISPLAY_ITEMS, payload: { data } });
+    } catch (error) {
+      console.log(error.response);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
   return (
     <AppContext.Provider
-      value={{ ...state, clearCart, removeItem, increase, decrease }}
+      value={{
+        ...state,
+        clearCart,
+        removeItem,
+        increase,
+        decrease,
+        totalAmount,
+        totalCost,
+      }}
     >
       {children}
     </AppContext.Provider>

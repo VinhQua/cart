@@ -1,12 +1,19 @@
 // components
 import Navbar from "./Navbar";
 import CartContainer from "./CartContainer";
+import { useGlobalContext } from "./context";
 
 function App() {
+  const { loading } = useGlobalContext();
   return (
     <main>
-      <Navbar />
-      <CartContainer />
+      {loading && <div className="loading" style={{ marginTop: "6rem" }}></div>}
+      {!loading && (
+        <>
+          <Navbar />
+          <CartContainer />
+        </>
+      )}
     </main>
   );
 }

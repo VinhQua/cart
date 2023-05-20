@@ -29,10 +29,21 @@ export const reducer = (state, action) => {
     const { id } = action.payload;
     const newCart = new Map(state.cart);
     const item = newCart.get(id);
-    const amount = item.amount - 1 < 0 ? 0 : item.amount - 1;
-    const newItem = { ...item, amount };
+
+    if (item.amount === 1) {
+      newCart.delete(id);
+      return { ...state, cart: newCart };
+    }
+    const newItem = { ...item, amount: item.amount - 1 };
     newCart.set(id, newItem);
     return { ...state, cart: newCart };
+  }
+  if (action.type === LOADING) {
+    return { ...state, loading: false };
+  }
+  if (action.type === DISPLAY_ITEMS) {
+    const newCart = new Map(action.payload.data.map((item) => [item.id, item]));
+    return { ...state, loading: false, cart: newCart };
   }
   throw new Error(`no matching action type :${action.type}`);
 };
